@@ -1,5 +1,2 @@
-_site
-.sass-cache
 .idea
-photos
-s3_website.yml
+node_modules

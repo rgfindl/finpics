@@ -1,0 +1,15 @@
+.front_page .picset {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    width: 150px;
+    height: 125px;
+}
+
+.front_page .picset div img {
+    max-width: 150px;
+    max-height: 105px;
+}
+.front_page .picset div {
+    height: 102px;
+}
