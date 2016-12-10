@@ -13,3 +13,16 @@
 .front_page .picset div {
     height: 102px;
 }
+
+.picset_page .pic {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    width: 150px;
+    height: 125px;
+}
+
+.picset_page .pic img {
+    max-width: 150px;
+    max-height: 105px;
+}

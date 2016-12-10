@@ -1,9 +1,9 @@
 <div class="container picset_page">
     <div class="row">
         <div class="col-md-12">
-            <section ng-controller="PicsetController">
+            <section>
                 <div ng-repeat="pic in pics" class="pic">
-                    {{pic}}
+                    <a href="#!/pic?pic={{pic}}"><img src="http://finpics.com/{{pic}}"/></a>
                 </div>
             </section>
         </div>
