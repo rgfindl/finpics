@@ -4,6 +4,12 @@ var myapp = angular.module('finpics', ['ngRoute', 'mgDirectives'], function($htt
 }).run(['$location', function($location){
 }]);
 
+myapp.constant('config', {
+    bucket: 'finpics-pics',
+    domain: 'https://s3.amazonaws.com/finpics-pics',
+    CognitoIdentityPoolId: 'us-east-1:ace886dd-7a0b-456c-a49d-b83dbbe8520c'
+});
+
 //
 // Routes
 //
@@ -27,16 +33,14 @@ myapp.config(['$routeProvider',
         });
     }]);
 
-
-
 myapp.controller('IndexController', IndexController);
 myapp.controller('PicsetController', PicsetController);
 myapp.controller('PicController', PicController);
 
-function IndexController($scope, $http) {
+function IndexController($scope, $http, $rootScope, config) {
     $scope.master = {};
+    $scope.domain = config.domain;
     $scope.picsets = {};
-    console.log('here1');
 
     $scope.loading = true;
     $http.get('/picsets_image.json').then(function (res) {
@@ -57,14 +61,15 @@ function IndexController($scope, $http) {
     });
 };
 
-function PicsetController($scope, $routeParams, $rootScope) {
+function PicsetController($scope, $routeParams, $rootScope, config) {
     $scope.master = {};
+    $scope.domain = config.domain;
     $scope.pics = [];
     var pics = [];
     // Initialize the Amazon Cognito credentials provider
     AWS.config.region = 'us-east-1'; // Region
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: 'us-east-1:ace886dd-7a0b-456c-a49d-b83dbbe8520c'
+        IdentityPoolId: config.CognitoIdentityPoolId
     });
     console.log('here');
     var s3 = new AWS.S3();
@@ -75,7 +80,7 @@ function PicsetController($scope, $routeParams, $rootScope) {
             return done;
         }, function(asyncCallback) {
             var params = {
-                Bucket: 'finpics.com', /* required */
+                Bucket: config.bucket, /* required */
                 Prefix: 'photos/'+$routeParams.path
             };
             if (next_marker) {
@@ -107,7 +112,8 @@ function PicsetController($scope, $routeParams, $rootScope) {
         });
 };
 
-function PicController($scope, $routeParams, $rootScope) {
+function PicController($scope, $routeParams, $rootScope, config) {
     $scope.master = {};
+    $scope.domain = config.domain;
     $scope.pic = _.replace($routeParams.pic, '/thumbs', '');
 };
