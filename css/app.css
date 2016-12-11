@@ -1,3 +1,25 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 80px;
+}
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+    background-color: #f5f5f5;
+}
+.footer_container .text-muted {
+    margin: 20px 0;
+}
+
 
 .mg-alert {
     padding: 20px;
@@ -41,4 +63,9 @@
 .picset_page .pic img {
     max-width: 150px;
     max-height: 105px;
+}
+
+.mini_jumbotron .jumbotron {
+    padding-top: 0px;
+    padding-bottom: 20px;
 }
