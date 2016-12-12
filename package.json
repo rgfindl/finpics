@@ -1,0 +1,37 @@
+{
+  "name": "finpics",
+  "version": "1.0.0",
+  "description": "Use AWS Rekognition to provide a faces search of finpics.com",
+  "main": "index.js",
+  "devDependencies": {
+    "async": "^2.1.4",
+    "aws-sdk": "^2.7.13",
+    "local-web-server": "^1.2.6",
+    "lodash": "^4.17.2",
+    "winston": "^2.3.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://rgfindl@github.com/rgfindl/finpics.git"
+  },
+  "keywords": [
+    "lambda",
+    "rekognition",
+    "cognito",
+    "dynamodb",
+    "s3",
+    "route53",
+    "aws",
+    "photo",
+    "album"
+  ],
+  "author": "rgfindley@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rgfindl/finpics/issues"
+  },
+  "homepage": "https://github.com/rgfindl/finpics#readme"
+}

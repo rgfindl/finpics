@@ -91,7 +91,7 @@ function IndexController($scope, $http, $rootScope, config, cache) {
     } else {
         picsets = {};
         $scope.loading = true;
-        $http.get('/picsets_image.json').then(function (res) {
+        $http.get('/picset-images.json').then(function (res) {
             $scope.loading = false;
             picsets = _.map(res.data, function(image) {
                 var dir = _.split(image, '/')[0];
