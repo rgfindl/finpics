@@ -91,23 +91,44 @@ function IndexController($scope, $http, $rootScope, config, cache) {
     } else {
         picsets = {};
         $scope.loading = true;
-        $http.get('/picset-images.json').then(function (res) {
-            $scope.loading = false;
-            picsets = _.map(res.data, function(image) {
-                var dir = _.split(image, '/')[0];
-                return {
-                    path: dir,
-                    name: _.join(_.drop(_.split(dir, '_')), ' '),
-                    image: image
-                }
-            });
-            $scope.picsets = picsets;
-            cache.store('picsets', picsets);
-        },function(res) {
-            console.log(JSON.stringify(res, null, 3));
-            $scope.loading = false;
-            $scope.error = true;
-            $rootScope.$broadcast('mgalert', 'Please check errors.', 3);
+
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'us-east-1'; // Region
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: config.CognitoIdentityPoolId
+        });
+
+        var docClient = new AWS.DynamoDB.DocumentClient();
+        var params = {
+            TableName: 'pics',
+            KeyConditionExpression: "primarykey = :primarykey",
+            ScanIndexForward: false,
+            ExpressionAttributeValues: {
+                ":primarykey": '/'
+            }
+        };
+        console.log(JSON.stringify(params));
+        docClient.query(params, function(err, data) {
+            if (err)  {
+                $scope.loading = false;
+                $scope.error = true;
+                $rootScope.$broadcast('mgalert', 'Please check errors.', 3);
+                console.log(err);
+            } else {
+                $scope.loading = false;
+                picsets = _.map(data.Items, function(item) {
+                    return {
+                        path: item.sortkey,
+                        name: _.join(_.drop(_.split(item.sortkey, '_')), ' '),
+                        image: item.sortkey + '/thumbs/' + item.pic
+                    }
+                });
+                $scope.picsets = picsets;
+                cache.store('picsets', picsets);
+            }
+            if(!$scope.$$phase) {
+                $scope.$digest($scope);
+            }
         });
     }
 };
@@ -123,11 +144,6 @@ function PicsetController($scope, $routeParams, $rootScope, config, cache) {
     } else {
         pics = [];
         $scope.loading = true;
-        // Initialize the Amazon Cognito credentials provider
-        AWS.config.region = 'us-east-1'; // Region
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: config.CognitoIdentityPoolId
-        });
         console.log('here');
         var s3 = new AWS.S3();
         var done = false;

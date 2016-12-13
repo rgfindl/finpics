@@ -1,5 +1,4 @@
 .idea
 node_modules
 photos
-_site
-.sass-cache
+npm-debug.log

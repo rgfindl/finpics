@@ -1,15 +1,30 @@
 # finpics
 Use AWS Rekognition to provide a faces search of finpics.com
 
+## DynamoDB
+### pics table
+* primaykey (Primary Key)
+* sortKey (Sort Key)
+* ... Rekognition IndexFaces response
+
+*Picsets*
+* primaykey: '/' (Primary Key)
+* sortkey: '014_newportboston' (Sort Key)
+* pic: 'Newport_pic_3.jpg'
+
+*Pics*
+* primaykey: '014_newportboston' (Primary Key)
+* sortkey: 'Newport_pic_3.jpg' (Sort Key)
+* ... Rekognition IndexFaces response
+
 ## Develop locally
-npm install local-web-server
-ws
+npm run serve
 
 ## Deploy
 Install AWS CLI and configure profile credentials.
 
 ### Web Assets
-aws s3 sync . s3://finpics.com --exclude "photos/*" --exclude ".gitignore" --exclude ".idea/*" --exclude ".git/*" --exclude "util/*" --exclude "node_modules/*" --exclude "package.json" --dryrun --storage-class REDUCED_REDUNDANCY --profile bluefin
+npm run deploy-site
 
 ### Photos
-aws s3 sync . s3://finpics-pics --exclude "*" --include "photos/*" --storage-class REDUCED_REDUNDANCY --profile bluefin
+npm ren deploy-pics

@@ -11,7 +11,10 @@
     "winston": "^2.3.0"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "deploy-site": "aws s3 sync . s3://finpics.com --exclude \"*\" --include \"index.html\" --include \"favicon.ico\" --include \"css/*\" --include \"images/*\" --include \"js/*\" --include \"partials/*\" --storage-class REDUCED_REDUNDANCY --profile bluefin",
+    "deploy-pics": "aws s3 sync . s3://finpics-pics --exclude \"*\" --include \"photos/*\" --storage-class REDUCED_REDUNDANCY --profile bluefin",
+    "serve": "ws"
   },
   "repository": {
     "type": "git",
