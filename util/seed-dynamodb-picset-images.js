@@ -29,7 +29,7 @@ functions.put = function(folder, image, callback) {
 var picset_images = require('./picset-images.json');
 async.eachSeries(picset_images, function(image, next){
     var split = _.split(image, '/');
-    functions.put(split[0], split[2], next);
+    functions.put(split[0], split[1], next);
 }, function(err) {
     winston.info('Done');
 });
