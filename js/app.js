@@ -7,6 +7,7 @@ var myapp = angular.module('finpics', ['ngRoute', 'mgDirectives'], function($htt
 myapp.constant('config', {
     bucket: 'finpics-pics',
     domain: 'https://s3.amazonaws.com/finpics-pics',
+    domain_thumbs: 'https://s3.amazonaws.com/finpics-thumbs',
     CognitoIdentityPoolId: 'us-east-1:ace886dd-7a0b-456c-a49d-b83dbbe8520c'
 });
 
@@ -46,6 +47,18 @@ myapp.factory('cache', function ($rootScope) {
     };
 });
 
+myapp.factory('aws', function(config) {
+    // Initialize the Amazon Cognito credentials provider
+    AWS.config.region = 'us-east-1'; // Region
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: config.CognitoIdentityPoolId
+    });
+
+    return {
+        docClient: new AWS.DynamoDB.DocumentClient()
+    };
+});
+
 myapp.directive("keepScrollPos", function($route, $window, $timeout, $location, $anchorScroll) {
 
     // cache scroll position of each route's templateUrl
@@ -81,10 +94,11 @@ myapp.controller('IndexController', IndexController);
 myapp.controller('PicsetController', PicsetController);
 myapp.controller('PicController', PicController);
 
-function IndexController($scope, $http, $rootScope, config, cache) {
+function IndexController($scope, $http, $rootScope, config, cache, aws) {
     $rootScope.body_class='index_body';
     $scope.master = {};
     $scope.domain = config.domain;
+    $scope.domain_thumbs = config.domain_thumbs;
     var picsets = cache.get('picsets');
     if (!_.isNil(picsets)) {
         $scope.picsets = picsets;
@@ -92,13 +106,7 @@ function IndexController($scope, $http, $rootScope, config, cache) {
         picsets = {};
         $scope.loading = true;
 
-        // Initialize the Amazon Cognito credentials provider
-        AWS.config.region = 'us-east-1'; // Region
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: config.CognitoIdentityPoolId
-        });
-
-        var docClient = new AWS.DynamoDB.DocumentClient();
+        var docClient = aws.docClient;
         var params = {
             TableName: 'pics',
             KeyConditionExpression: "primarykey = :primarykey",
@@ -120,7 +128,7 @@ function IndexController($scope, $http, $rootScope, config, cache) {
                     return {
                         path: item.sortkey,
                         name: _.join(_.drop(_.split(item.sortkey, '_')), ' '),
-                        image: item.sortkey + '/thumbs/' + item.pic
+                        image: item.sortkey + '/' + item.pic
                     }
                 });
                 $scope.picsets = picsets;
@@ -133,10 +141,11 @@ function IndexController($scope, $http, $rootScope, config, cache) {
     }
 };
 
-function PicsetController($scope, $routeParams, $rootScope, config, cache) {
+function PicsetController($scope, $routeParams, $rootScope, config, cache, aws) {
     $rootScope.body_class='mini_jumbotron picset_body';
     $scope.master = {};
     $scope.domain = config.domain;
+    $scope.domain_thumbs = config.domain_thumbs;
     $scope.pics = [];
     var pics = cache.get($routeParams.path);
     if (!_.isNil(pics)) {
@@ -145,55 +154,79 @@ function PicsetController($scope, $routeParams, $rootScope, config, cache) {
         pics = [];
         $scope.loading = true;
         console.log('here');
-        var s3 = new AWS.S3();
-        var done = false;
-        var next_marker = null;
-        async.until(
-            function() {
-                return done;
-            }, function(asyncCallback) {
-                var params = {
-                    Bucket: config.bucket, /* required */
-                    Prefix: 'photos/'+$routeParams.path
-                };
-                if (next_marker) {
-                    params.Marker = next_marker;
-                }
-                //console.log(JSON.stringify(params, null, 3));
-                s3.listObjects(params, function(err, data) {
-                    //console.log(JSON.stringify(data, null, 3));
-                    if (err) console.log(err);
-                    else {
-                        done = !data.IsTruncated;
-                        _.each(data.Contents, function(item) {
-                            next_marker = item.Key;
-                            if (item.Key.indexOf('/thumbs/') > 0 && !_.endsWith(item.Key, '.html') && (_.endsWith(_.toLower(item.Key), '.jpg') || _.endsWith(_.toLower(item.Key), '.jpeg') || _.endsWith(_.toLower(item.Key), '.png'))) {
-                                pics.push(item.Key);
-                            }
-                        });
+        var docClient = aws.docClient;
+        var params = {
+            TableName: 'pics',
+            KeyConditionExpression: "primarykey = :primarykey",
+            ScanIndexForward: false,
+            ExpressionAttributeValues: {
+                ":primarykey": $routeParams.path
+            }
+        };
+        console.log(JSON.stringify(params));
+        docClient.query(params, function(err, data) {
+            if (err)  {
+                $scope.loading = false;
+                $scope.error = true;
+                $rootScope.$broadcast('mgalert', 'Please check errors.', 3);
+                console.log(err);
+            } else {
+                $scope.loading = false;
+                pics = _.map(data.Items, function(item) {
+                    return {
+                        primarykey: item.primarykey,
+                        sortkey: item.sortkey,
+                        data: item.data,
+                        image: _.join(['photos', item.primarykey, item.sortkey], '/')
                     }
-                    asyncCallback(err);
                 });
-            }, function(err) {
-                if (err) {
-                    $scope.loading = false;
-                    $scope.error = true;
-                    $rootScope.$broadcast('mgalert', 'Please check errors.', 3);
-                } else {
-                    $scope.loading = false;
-                    $scope.pics = pics;
-                    cache.store($routeParams.path, pics);
-                    if(!$scope.$$phase) {
-                        $scope.$digest($scope);
-                    }
-                }
-            });
+                $scope.pics = pics;
+                cache.store($routeParams.path, pics);
+            }
+            if(!$scope.$$phase) {
+                $scope.$digest($scope);
+            }
+        });
     }
 };
 
-function PicController($scope, $routeParams, $rootScope, config) {
+function PicController($scope, $routeParams, $rootScope, config, cache, aws) {
     $rootScope.body_class='mini_jumbotron pic_body';
     $scope.master = {};
     $scope.domain = config.domain;
-    $scope.pic = _.replace($routeParams.pic, '/thumbs', '');
+    $scope.domain_thumbs = config.domain_thumbs;
+    var pics = cache.get($routeParams.primarykey);
+    if (!_.isNil(pics)) {
+        var pic = _.find(pics, {sortkey: $routeParams.sortkey});
+    }
+    if (_.isNil(pic)) {
+        var params = {
+            TableName: 'pics',
+            Key:{
+                primarykey: $routeParams.primarykey,
+                sortkey: $routeParams.sortkey
+            }
+        };
+        aws.docClient.get(params, function(err, data) {
+            if (err)  {
+                $scope.loading = false;
+                $scope.error = true;
+                $rootScope.$broadcast('mgalert', 'Please check errors.', 3);
+                console.log(err);
+            } else {
+                $scope.loading = false;
+                $scope.pic = {
+                        primarykey: data.Item.primarykey,
+                        sortkey: data.Item.sortkey,
+                        data: data.Item.data,
+                        image: _.join(['photos', data.Item.primarykey, data.Item.sortkey], '/')
+                    };
+            }
+            if(!$scope.$$phase) {
+                $scope.$digest($scope);
+            }
+        });
+    } else {
+        $scope.pic = pic;
+    }
 };

@@ -3,7 +3,7 @@
         <div class="col-md-12">
             <section>
                 <div ng-repeat="pic in pics" class="pic">
-                    <a href="#!/pic?pic={{pic}}"><img ng-src="{{domain}}/{{pic}}"/></a>
+                    <a href="#!/pic?primarykey={{pic.primarykey}}&sortkey={{pic.sortkey}}"><img ng-src="{{domain_thumbs}}/{{pic.image}}"/></a>
                 </div>
             </section>
         </div>

@@ -6,6 +6,7 @@ var winston = require('winston');
 var _ = require('lodash');
 var async = require('async');
 var AWS = require('aws-sdk');
+AWS.config.region = 'us-east-1';
 
 var docClient = new AWS.DynamoDB.DocumentClient();
 var s3 = new AWS.S3();
