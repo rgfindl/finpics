@@ -30,14 +30,12 @@ npm run deploy-site
 npm ren deploy-pics
 
 ## TODO
-- Script to process existing images.
- - (Maybe) Rename each image using uuid.  Must be sortable and in original order.
- - Move thumbs to another bucket with same path as original.
- - Index each image.
- - Store face information in dynamodb.
-- Use dynamodb to load picset pics instead of S3 scan.
 - Build lambda to handle S3 events.
  - Add feature pic.
  - Index image.
  - Store face information in dynamodb.
  - Generate thumb.
+- Add logic to UI to show faces within each image.
+- Make faces clickable which searches for more images with that face.
+- Add Federated Facebook login.
+- Allow people to select their face.

@@ -25,16 +25,13 @@ async.until(
             if (err) winston.error(err);
             else {
                 done = !data.IsTruncated;
-                async.eachSeries(data.Contents, function(item, eachCallback) {
+                _.forEach(data.Contents, function(item) {
                     next_marker = item.Key;
                     if (item.Key.indexOf('/thumbs/') > 0 && !_.endsWith(item.Key, '.html') && (_.endsWith(_.toLower(item.Key), '.jpg') || _.endsWith(_.toLower(item.Key), '.jpeg') || _.endsWith(_.toLower(item.Key), '.png'))) {
                         count ++;
-                    } else
-                        eachCallback(null);
-                }, function(err) {
-                    winston.info(count);
-                    asyncCallback(err);
+                    }
                 });
+                winston.info(next_marker);
             }
             asyncCallback(err);
         });
