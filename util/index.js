@@ -22,13 +22,18 @@ var functions = {};
 // Add to DynamoDB
 //
 functions.put = function(folder, image, data, callback) {
+    var item = {
+        primarykey: folder,
+        sortkey: image,
+        data: data
+    };
+    if (!_.isNil(item.data) && !_.isNil(item.data.FaceRecords) && !_.isEmpty(item.data.FaceRecords) &&
+        !_.isNil(item.data.FaceRecords[0].Face) && !_.isNil(item.data.FaceRecords[0].Face.ImageId)) {
+        item.rek_image_id = item.data.FaceRecords[0].Face.ImageId;
+    }
     var params = {
         TableName: 'pics',
-        Item: {
-            primarykey: folder,
-            sortkey: image,
-            data: data
-        }
+        Item: item
     };
     winston.info('Put DynamoDB');
     winston.info(JSON.stringify(params));
