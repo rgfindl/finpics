@@ -6,4 +6,11 @@
             </section>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div ng-repeat="face in pic.data.FaceRecords">
+                <a href="#!/search?imageid={{face.Face.ImageId}}&faceid={{face.Face.FaceId}}">{{face.Face.FaceId}}</a>
+            </div>
+        </div>
+    </div>
 </div>

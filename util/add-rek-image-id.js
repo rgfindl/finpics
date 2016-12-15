@@ -18,18 +18,15 @@ function onScan(err, data) {
         async.eachSeries(data.Items, function(item, next) {
             if (!_.isNil(item.data) && !_.isNil(item.data.FaceRecords) && !_.isEmpty(item.data.FaceRecords) &&
                 !_.isNil(item.data.FaceRecords[0].Face) && !_.isNil(item.data.FaceRecords[0].Face.ImageId)) {
-                var params = {
-                    TableName: 'pics',
-                    Key:{
-                        primarykey: item.primarykey,
-                        sortkey: item.sortkey
-                    },
-                    UpdateExpression: 'SET rek_image_id = :rek_image_id',
-                    ExpressionAttributeValues: {
-                        ':rek_image_id': item.data.FaceRecords[0].Face.ImageId
-                    }
+                var item = {
+                    image_id: item.data.FaceRecords[0].Face.ImageId,
+                    data: item.data
                 };
-                docClient.update(params, function(err, data) {
+                var params = {
+                    TableName: 'pics_by_image_id',
+                    Item: item
+                };
+                docClient.put(params, function(err, data) {
                     if (err) winston.error(err);
                     next(err)
                 });

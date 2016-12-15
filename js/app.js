@@ -29,6 +29,10 @@ myapp.config(['$routeProvider',
             templateUrl: '/partials/pic.html',
             controller: 'PicController'
         }).
+        when('/search', {
+            templateUrl: '/partials/picset.html',
+            controller: 'SearchController'
+        }).
         otherwise({
             redirectTo: '/index'
         });
@@ -92,6 +96,7 @@ myapp.directive("keepScrollPos", function($route, $window, $timeout, $location, 
 
 myapp.controller('IndexController', IndexController);
 myapp.controller('PicsetController', PicsetController);
+myapp.controller('SearchController', SearchController);
 myapp.controller('PicController', PicController);
 
 function IndexController($scope, $http, $rootScope, config, cache, aws) {
@@ -115,7 +120,6 @@ function IndexController($scope, $http, $rootScope, config, cache, aws) {
                 ":primarykey": '/'
             }
         };
-        console.log(JSON.stringify(params));
         docClient.query(params, function(err, data) {
             if (err)  {
                 $scope.loading = false;
@@ -153,7 +157,6 @@ function PicsetController($scope, $routeParams, $rootScope, config, cache, aws) 
     } else {
         pics = [];
         $scope.loading = true;
-        console.log('here');
         var docClient = aws.docClient;
         var params = {
             TableName: 'pics',
@@ -163,7 +166,6 @@ function PicsetController($scope, $routeParams, $rootScope, config, cache, aws) 
                 ":primarykey": $routeParams.path
             }
         };
-        console.log(JSON.stringify(params));
         docClient.query(params, function(err, data) {
             if (err)  {
                 $scope.loading = false;
@@ -187,6 +189,28 @@ function PicsetController($scope, $routeParams, $rootScope, config, cache, aws) 
                 $scope.$digest($scope);
             }
         });
+    }
+};
+
+function SearchController($scope, $routeParams, $rootScope, config, cache, aws) {
+    $rootScope.body_class='mini_jumbotron picset_body';
+    $scope.master = {};
+    $scope.domain = config.domain;
+    $scope.domain_thumbs = config.domain_thumbs;
+    $scope.pics = [];
+    var pics = cache.get($routeParams.faceid);
+    if (!_.isNil(pics)) {
+        $scope.pics = pics;
+    } else {
+        pics = [];
+        $scope.loading = true;
+        var params = {
+            CollectionId: 'finpics', /* required */
+            FaceId: $routeParams.faceid
+        };
+        // Can't call AWS Rekognition directly due to missing CORS support.  https://github.com/aws/aws-sdk-js/issues/1246
+        // Using API Gateway -> Lambda -> Rekognition.  Still serverless :)
+        // TODO
     }
 };
 
