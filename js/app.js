@@ -59,7 +59,8 @@ myapp.factory('aws', function(config) {
     });
 
     return {
-        docClient: new AWS.DynamoDB.DocumentClient()
+        docClient: new AWS.DynamoDB.DocumentClient(),
+        lambda: new AWS.Lambda()
     };
 });
 
@@ -209,8 +210,36 @@ function SearchController($scope, $routeParams, $rootScope, config, cache, aws) 
             FaceId: $routeParams.faceid
         };
         // Can't call AWS Rekognition directly due to missing CORS support.  https://github.com/aws/aws-sdk-js/issues/1246
-        // Using API Gateway -> Lambda -> Rekognition.  Still serverless :)
-        // TODO
+        // Use Lambda -> Rekognition.  Still serverless :)
+        var params = {
+            FunctionName: 'finpics-dev-search', /* required */
+            InvocationType: 'RequestResponse',
+            LogType: 'Tail',
+            Payload: JSON.stringify({
+                faceid: $routeParams.faceid
+            })
+        };
+        aws.lambda.invoke(params, function(err, data) {
+            if (err)  {
+                $scope.loading = false;
+                $scope.error = true;
+                $rootScope.$broadcast('mgalert', 'Please check errors.', 3);
+                console.log(err);
+            } else {
+                $scope.loading = false;
+                console.log(data);
+                $scope.pics = _.map(JSON.parse(data.Payload).output, function(item) {
+                    item.image= _.join(['photos', item.image_path], '/');
+                    item.primarykey = _.split(item.image_path, '/')[0];
+                    item.sortkey = _.split(item.image_path, '/')[1];
+                    return item;
+                });
+                cache.store($routeParams.faceid, pics);
+            }
+            if(!$scope.$$phase) {
+                $scope.$digest($scope);
+            }
+        });
     }
 };
 

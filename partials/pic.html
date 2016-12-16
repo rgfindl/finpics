@@ -8,6 +8,8 @@
     </div>
     <div class="row">
         <div class="col-md-12">
+            <h3>Faces</h3>
+            <p>Click on a face ID to find more images with this face in it.</p>
             <div ng-repeat="face in pic.data.FaceRecords">
                 <a href="#!/search?imageid={{face.Face.ImageId}}&faceid={{face.Face.FaceId}}">{{face.Face.FaceId}}</a>
             </div>

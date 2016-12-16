@@ -2,3 +2,4 @@
 node_modules
 photos
 npm-debug.log
+.serverless

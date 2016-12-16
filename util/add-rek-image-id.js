@@ -20,7 +20,8 @@ function onScan(err, data) {
                 !_.isNil(item.data.FaceRecords[0].Face) && !_.isNil(item.data.FaceRecords[0].Face.ImageId)) {
                 var item = {
                     image_id: item.data.FaceRecords[0].Face.ImageId,
-                    data: item.data
+                    data: item.data,
+                    image_path: item.primarykey+'/'+item.sortkey
                 };
                 var params = {
                     TableName: 'pics_by_image_id',
