@@ -227,7 +227,6 @@ function SearchController($scope, $routeParams, $rootScope, config, cache, aws) 
                 console.log(err);
             } else {
                 $scope.loading = false;
-                console.log(data);
                 $scope.pics = _.map(JSON.parse(data.Payload).output, function(item) {
                     item.image= _.join(['photos', item.image_path], '/');
                     item.primarykey = _.split(item.image_path, '/')[0];
@@ -248,6 +247,7 @@ function PicController($scope, $routeParams, $rootScope, config, cache, aws) {
     $scope.master = {};
     $scope.domain = config.domain;
     $scope.domain_thumbs = config.domain_thumbs;
+    $scope.loading = true;
     var pics = cache.get($routeParams.primarykey);
     if (!_.isNil(pics)) {
         var pic = _.find(pics, {sortkey: $routeParams.sortkey});
@@ -280,6 +280,7 @@ function PicController($scope, $routeParams, $rootScope, config, cache, aws) {
             }
         });
     } else {
+        $scope.loading = false;
         $scope.pic = pic;
     }
 };

@@ -2,6 +2,7 @@
     <div class="row">
         <div class="col-md-12">
             <section>
+                <img class="loading" ng-show="loading" src="/images/loading_spinner.gif"/>
                 <div ng-repeat="picset in picsets" class="picset">
                     <div>
                         <a href="#!/picset?path={{picset.path}}"><img ng-src="{{domain_thumbs}}/photos/{{picset.image}}"/></a>
