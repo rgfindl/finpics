@@ -3,7 +3,7 @@
         <div class="col-md-12">
             <section>
                 <img class="loading" ng-show="loading" src="/images/loading_spinner.gif"/>
-                <img class="img-responsive" ng-src="{{domain}}/{{pic.image}}"/>
+                <img class="img-responsive" imageonload ng-src="{{domain}}/{{pic.image}}"/>
             </section>
         </div>
     </div>
@@ -11,8 +11,12 @@
         <div class="col-md-12">
             <h3>Faces</h3>
             <p>Click on a face ID to find more images with this face in it.</p>
-            <div ng-repeat="face in pic.data.FaceRecords">
-                <a href="#!/search?imageid={{face.Face.ImageId}}&faceid={{face.Face.FaceId}}">{{face.Face.FaceId}}</a>
+            <div ng-repeat="face in pic.data.FaceRecords" class="face">
+                <a href="#!/search?imageid={{face.Face.ImageId}}&faceid={{face.Face.FaceId}}"
+                   data-top="{{face.Face.BoundingBox.Top}}"
+                   data-left="{{face.Face.BoundingBox.Left}}"
+                   data-height="{{face.Face.BoundingBox.Height}}"
+                   data-width="{{face.Face.BoundingBox.Width}}">.</a>
             </div>
         </div>
     </div>

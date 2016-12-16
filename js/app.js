@@ -95,6 +95,40 @@ myapp.directive("keepScrollPos", function($route, $window, $timeout, $location, 
     }
 });
 
+myapp.directive('imageonload', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            element.bind('load', function() {
+                // Once the pic loads.  Calculate the faces and place them in the links.
+                $.each($('.face a'), function(index, face) {
+                    var naturalHeight = element[0].naturalHeight;
+                    var naturalWidth = element[0].naturalWidth;
+                    var naturalTop = parseFloat($(this).attr('data-top')) * naturalHeight;
+                    var naturalLeft = parseFloat($(this).attr('data-left')) * naturalWidth;
+                    var naturalFaceWidth = parseFloat($(this).attr('data-width')) * naturalWidth;
+                    var naturalFaceHeight = parseFloat($(this).attr('data-height')) * naturalHeight;
+                    var crop = {  // the canvas coordinate system
+                        top : naturalTop,
+                        left : naturalLeft,
+                        right : naturalLeft + naturalFaceWidth,
+                        bottom : naturalTop + naturalFaceHeight
+                    };
+                    var canvas = document.createElement("canvas");
+                    canvas.width = crop.right - crop.left;
+                    canvas.height = crop.bottom - crop.top;
+                    var ctx = canvas.getContext("2d"); // so we can draw
+                    ctx.drawImage(element[0], -crop.left, -crop.top);
+                    $(this).html(canvas);
+                });
+            });
+            element.bind('error', function(){
+                console.log('image could not be loaded');
+            });
+        }
+    };
+});
+
 myapp.controller('IndexController', IndexController);
 myapp.controller('PicsetController', PicsetController);
 myapp.controller('SearchController', SearchController);
@@ -275,6 +309,7 @@ function PicController($scope, $routeParams, $rootScope, config, cache, aws) {
                         image: _.join(['photos', data.Item.primarykey, data.Item.sortkey], '/')
                     };
             }
+            console.log($scope.pic);
             if(!$scope.$$phase) {
                 $scope.$digest($scope);
             }
@@ -282,5 +317,6 @@ function PicController($scope, $routeParams, $rootScope, config, cache, aws) {
     } else {
         $scope.loading = false;
         $scope.pic = pic;
+        console.log($scope.pic);
     }
 };

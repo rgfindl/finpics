@@ -69,3 +69,14 @@ body {
     padding-top: 0px;
     padding-bottom: 20px;
 }
+
+.face {
+    float: left;
+    padding-right: 5px;
+    padding-bottom: 10px;
+}
+
+.face a canvas {
+    max-width: 150px;
+    max-height: 150px;
+}
