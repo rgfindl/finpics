@@ -21,3 +21,5 @@ provider:
 functions:
   search:
     handler: handler.search
+  s3:
+    handler: handler.s3

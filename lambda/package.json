@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.1.4",
+    "gm": "^1.23.0",
     "lodash": "^4.17.2",
     "winston": "^2.3.0"
   },

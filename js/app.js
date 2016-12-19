@@ -267,7 +267,7 @@ function SearchController($scope, $routeParams, $rootScope, config, cache, aws) 
                     item.sortkey = _.split(item.image_path, '/')[1];
                     return item;
                 });
-                cache.store($routeParams.faceid, pics);
+                cache.store($routeParams.faceid, $scope.pics);
             }
             if(!$scope.$$phase) {
                 $scope.$digest($scope);
