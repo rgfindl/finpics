@@ -27,7 +27,7 @@ Install AWS CLI and configure profile credentials.
 npm run deploy-site
 
 ### Photos
-npm ren deploy-pics
+npm run upload-pics photos/383
 
 ## TODO
 - Update lambda to auto-orient pictures if needed.

@@ -155,7 +155,7 @@ module.exports = {
               var height = scalingFactor * size.height;
 
               // Transform the image buffer in memory.
-              this.resize(width, height)
+              this.resize(width, height).autoOrient()
                   .toBuffer(imageType, function(err, buffer) {
                     if (err) {
                       next(err);

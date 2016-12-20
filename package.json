@@ -6,6 +6,7 @@
   "devDependencies": {
     "async": "^2.1.4",
     "aws-sdk": "^2.7.13",
+    "gm": "^1.23.0",
     "local-web-server": "^1.2.6",
     "lodash": "^4.17.2",
     "winston": "^2.3.0"
@@ -13,7 +14,7 @@
   "scripts": {
     "test": "mocha",
     "deploy-site": "aws s3 sync . s3://finpics.com --exclude \"*\" --include \"index.html\" --include \"favicon.ico\" --include \"css/*\" --include \"images/*\" --include \"js/*\" --include \"partials/*\" --storage-class REDUCED_REDUNDANCY --profile bluefin",
-    "deploy-pics": "aws s3 sync . s3://finpics-pics --exclude \"*\" --include \"photos/*\" --storage-class REDUCED_REDUNDANCY --dryrun --profile bluefin",
+    "upload-pics": "node util/upload-pics.js",
     "serve": "ws"
   },
   "repository": {
