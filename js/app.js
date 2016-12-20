@@ -196,7 +196,7 @@ function PicsetController($scope, $routeParams, $rootScope, config, cache, aws) 
         var params = {
             TableName: 'pics',
             KeyConditionExpression: "primarykey = :primarykey",
-            ScanIndexForward: false,
+            ScanIndexForward: true,
             ExpressionAttributeValues: {
                 ":primarykey": $routeParams.path
             }

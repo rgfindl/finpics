@@ -30,12 +30,4 @@ npm run deploy-site
 npm ren deploy-pics
 
 ## TODO
-- Build lambda to handle S3 events.
- - Add feature pic.
- - Index image.
- - Store face information in dynamodb.
- - Generate thumb.
-- Add logic to UI to show faces within each image.
-- Make faces clickable which searches for more images with that face.
-- Add Federated Facebook login.
-- Allow people to select their face.
+- Update lambda to auto-orient pictures if needed.

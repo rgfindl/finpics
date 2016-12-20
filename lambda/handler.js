@@ -187,7 +187,7 @@ module.exports = {
               UpdateExpression: "set pic = :pic",
               ConditionExpression: "attribute_not_exists(pic)",
               ExpressionAttributeValues:{
-                ':pic': _.join(image_parts, '/')
+                ':pic': _.last(image_parts)
               }
             };
             winston.info(JSON.stringify(params));
